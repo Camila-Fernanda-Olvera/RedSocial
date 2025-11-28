@@ -14,3 +14,4 @@ Commit automático: social: conexión creada - Fecha: 2025-11-27 22:34:39 - Auto
 Commit automático: social: actualización de perfil - Fecha: 2025-11-27 22:50:29 - Autor: vickyjuarez
 publicaciones: a�adir metadatos de publicaci�n - Fecha: 2025-11-27 23:01:10
 imagenes: optimizar carga y placeholder - Fecha: 2025-11-27 23:01:11
+comentarios: establecer tiempo l�mite de comentarios - Fecha: 2025-11-27 23:01:13
