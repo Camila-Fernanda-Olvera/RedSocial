@@ -386,6 +386,18 @@
                         title: 'Error',
                         text: 'Error al publicar comentario',
                         background: '#1f2937',
+                        color: '#fff',
+                        confirmButtonColor: '#3b82f6'
+                    });
+                }
+            } catch (error) {
+                console.error('Error:', error);
+            }
+        }
+
+        // Toast Helper Function
+        function showToast(message, type = 'info') {
+            const toastContainer = document.getElementById('toastContainer');
             const toastId = 'toast-' + Date.now();
             
             const bgColor = type === 'success' ? 'bg-success' : type === 'error' ? 'bg-danger' : 'bg-info';
