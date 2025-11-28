@@ -238,7 +238,31 @@
                     body: JSON.stringify(data)
                 });
                 const result = await response.json();
-                if (!response.ok) alert(result.message);
+                
+                if (response.ok) {
+                    // Fetch updated profile to sync localStorage
+                    const profileResponse = await fetch(`api/get_profile.php?user_id=${user.id}`);
+                    if (profileResponse.ok) {
+                        const updatedUser = await profileResponse.json();
+                        // Merge with existing session data (keep id, etc)
+                        const newSession = { ...user, ...updatedUser };
+                        localStorage.setItem('quorum_user', JSON.stringify(newSession));
+                        
+                        // Update global user variable if needed, or reload
+                        // Ideally, we update the UI immediately without reload
+                        // But for simplicity and robustness, we can update the 'user' variable
+                        Object.assign(user, updatedUser);
+                        
+                        // Update UI elements that might not have been updated by the specific change handlers
+                        if (updatedUser.foto_perfil) {
+                            const src = updatedUser.foto_perfil.startsWith('data:') ? updatedUser.foto_perfil : `assets/img/${updatedUser.foto_perfil}`;
+                            document.getElementById('navProfilePic').src = src;
+                            document.getElementById('createPostProfilePic').src = src;
+                        }
+                    }
+                } else {
+                    alert(result.message);
+                }
             } catch (error) {
                 console.error('Error updating profile:', error);
             }
