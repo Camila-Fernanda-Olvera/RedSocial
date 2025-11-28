@@ -8,3 +8,4 @@ Commit de prueba: social: publicación compartida - Fecha: 27-11-2025
 Commit automático: social: nuevo seguidor - Fecha: 2025-11-27 20:06:27 - Autor: vickyjuarez
 Commit automático: login: sesión iniciada - Fecha: 2025-11-27 20:07:27 - Autor: vickyjuarez
 Commit automático: social: conexión creada - Fecha: 2025-11-27 20:07:33 - Autor: vickyjuarez
+Commit automático: social: nuevo seguidor - Fecha: 2025-11-27 21:51:51 - Autor: vickyjuarez
