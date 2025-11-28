@@ -4,7 +4,7 @@ let currentUser = null;
 // Initialize on page load
 document.addEventListener('DOMContentLoaded', async () => {
     currentUser = JSON.parse(localStorage.getItem('quorum_user'));
-    
+
     if (!currentUser) {
         window.location.href = 'Index.html';
         return;
@@ -12,7 +12,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     // Update UI with user info
     await updateUserUI();
-    
+
     // Load feed
     await loadFeed();
 });
@@ -52,13 +52,13 @@ async function updateUserUI() {
 // Load feed posts
 async function loadFeed() {
     const container = document.getElementById('feedContainer');
-    
+
     try {
         const response = await fetch('api/get_posts.php');
         const posts = await response.json();
-        
+
         container.innerHTML = '';
-        
+
         if (posts.length === 0) {
             container.innerHTML = '<div class="text-center text-gray-500 py-10">No hay publicaciones aún. ¡Sé el primero en publicar!</div>';
             return;
@@ -78,7 +78,7 @@ function renderPost(post) {
     const userPhoto = post.foto_perfil && post.foto_perfil.startsWith('data:') ? post.foto_perfil : `assets/img/${post.foto_perfil || 'default_profile.png'}`;
     const postImage = post.image ? `<div class="rounded-lg overflow-hidden mb-4 border border-gray-700"><img src="${post.image}" class="w-full h-auto object-cover"></div>` : '';
     const commentsHTML = post.comments ? post.comments.map(c => renderComment(c)).join('') : '';
-    
+
     return `
         <div class="glass-panel rounded-xl p-4">
             <div class="flex items-center justify-between mb-4">
@@ -124,13 +124,14 @@ function renderPost(post) {
 // Render a single comment
 function renderComment(comment) {
     const userPhoto = comment.foto_perfil && comment.foto_perfil.startsWith('data:') ? comment.foto_perfil : `assets/img/${comment.foto_perfil || 'default_profile.png'}`;
-    
+
     return `
         <div class="flex gap-2 items-start">
             <img src="${userPhoto}" class="w-8 h-8 rounded-full object-cover">
-            <div class="bg-gray-800 rounded-2xl px-4 py-2">
+            <div class="bg-gray-800 rounded-2xl px-4 py-2 flex-1">
                 <p class="font-bold text-xs text-gray-300">${comment.nombre}</p>
                 <p class="text-sm text-gray-200">${comment.content}</p>
+                <p class="text-xs text-gray-500 mt-1">${formatDate(comment.created_at)}</p>
             </div>
         </div>
     `;
@@ -153,7 +154,7 @@ async function handleCommentKeypress(e, postId) {
 async function submitComment(postId) {
     const input = document.getElementById(`input-comment-${postId}`);
     const content = input.value.trim();
-    
+
     if (!content) return;
 
     try {
@@ -227,7 +228,7 @@ function removeImage() {
 }
 
 // Image preview
-document.getElementById('postImage').addEventListener('change', async function(e) {
+document.getElementById('postImage').addEventListener('change', async function (e) {
     const file = e.target.files[0];
     if (file) {
         const base64 = await convertToBase64(file);
@@ -247,9 +248,9 @@ function convertToBase64(file) {
 }
 
 // Create post form submission
-document.getElementById('createPostForm').addEventListener('submit', async function(e) {
+document.getElementById('createPostForm').addEventListener('submit', async function (e) {
     e.preventDefault();
-    
+
     const content = document.getElementById('postContent').value.trim();
     const imageFile = document.getElementById('postImage').files[0];
     const submitBtn = document.getElementById('submitPostBtn');
@@ -315,7 +316,7 @@ function showToast(message, type = 'info') {
     const toastContainer = document.getElementById('toastContainer');
     const toastId = 'toast-' + Date.now();
     const bgColor = type === 'success' ? 'bg-success' : type === 'error' ? 'bg-danger' : 'bg-info';
-    
+
     const toastHTML = `
         <div id="${toastId}" class="toast align-items-center text-white ${bgColor} border-0" role="alert" aria-live="assertive" aria-atomic="true">
             <div class="d-flex">
@@ -324,12 +325,12 @@ function showToast(message, type = 'info') {
             </div>
         </div>
     `;
-    
+
     toastContainer.insertAdjacentHTML('beforeend', toastHTML);
     const toastElement = document.getElementById(toastId);
     const toast = new bootstrap.Toast(toastElement, { delay: 3000 });
     toast.show();
-    
+
     toastElement.addEventListener('hidden.bs.toast', () => toastElement.remove());
 }
 
