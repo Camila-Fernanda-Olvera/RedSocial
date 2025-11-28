@@ -1,5 +1,5 @@
 param(
-    [switch]$Push
+    [switch]$NoPush
 )
 
 # Script para ejecutar la acción cuando el usuario envía "ejecutar"
@@ -7,7 +7,7 @@ param(
 # - configura localmente user.name y user.email a 'vickyjuarez' / 'jvirginiamonserrat@gmail.com'
 # - añade una línea temática a `wii/placeholder.txt` (por defecto)
 # - hace commit con un mensaje seleccionado aleatoriamente de la lista temática
-# - opcional: hace push si se llama con -Push
+# - por defecto hace push; usar -NoPush para evitar el push
 
 $ScriptDir = Split-Path -Parent $MyInvocation.MyCommand.Path
 $RepoRoot = Resolve-Path (Join-Path $ScriptDir "..")
@@ -41,14 +41,15 @@ Add-Content -Path $File -Value $Line
 Write-Output "Archivo modificado: $File"
 Write-Output "Mensaje seleccionado: $Message"
 
+
 git add $File
 git commit -m "$Message"
 
-if ($Push) {
+if (-not $NoPush) {
     Write-Output "Push automático activado: haciendo push a origin main..."
     git push origin main
 } else {
-    Write-Output "Push no realizado (llama con -Push para subir)."
+    Write-Output "Push desactivado por -NoPush."
 }
 
 Write-Output "Último commit:"; git log -1 --pretty=format:"%h %an <%ae> %s"
