@@ -376,7 +376,9 @@
                     container.innerHTML += postHTML;
                 });
             } catch (error) {
-                container.innerHTML = '<div class="text-center text-red-400 py-10">Error al cargar publicaciones.</div>';
+                console.error('Error completo al cargar publicaciones:', error);
+                console.error('Error stack:', error.stack);
+                container.innerHTML = `<div class="text-center text-red-400 py-10">Error al cargar publicaciones: ${error.message}</div>`;
             }
         }
 
