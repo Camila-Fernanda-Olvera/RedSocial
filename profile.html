@@ -159,7 +159,6 @@
                     // Update UI
                     document.getElementById('profileName').innerText = data.nombre;
                     document.getElementById('profileDesc').innerText = data.descripcion || 'Sin descripción';
-                    document.getElementById('joinDate').innerText = new Date(data.fecha_registro).getFullYear();
                     
                     // Update Images
                     if (data.foto_perfil && data.foto_perfil !== 'default_profile.png') {
