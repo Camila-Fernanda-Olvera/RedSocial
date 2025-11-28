@@ -23,43 +23,27 @@
             backdrop-filter: blur(12px);
             border-bottom: 1px solid rgba(255, 255, 255, 0.1);
         }
-        /* Hide scrollbar for Chrome, Safari and Opera */
-        .no-scrollbar::-webkit-scrollbar {
-            display: none;
-        }
-        /* Hide scrollbar for IE, Edge and Firefox */
-        .no-scrollbar {
-            -ms-overflow-style: none;  /* IE and Edge */
-            scrollbar-width: none;  /* Firefox */
-        }
+        .no-scrollbar::-webkit-scrollbar { display: none; }
+        .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
     </style>
 </head>
 <body class="bg-gray-900 text-white h-screen overflow-hidden flex flex-col">
 
     <!-- Navbar -->
     <nav class="glass-nav w-full z-50 px-4 py-3 flex justify-between items-center fixed top-0">
-        <!-- Logo -->
         <div class="flex items-center gap-4">
-            <h1 class="text-2xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-blue-400 to-pink-400">
-                Quórum
-            </h1>
-            <!-- Search (Hidden on mobile) -->
+            <h1 class="text-2xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-blue-400 to-pink-400">Quórum</h1>
             <div class="hidden md:flex items-center bg-gray-800/50 rounded-full px-4 py-2 border border-gray-700">
                 <i class="fas fa-search text-gray-400 mr-2"></i>
                 <input type="text" placeholder="Buscar en Quórum" class="bg-transparent border-none focus:outline-none text-sm text-gray-200 w-48">
             </div>
         </div>
-
-        <!-- Center Nav Icons -->
         <div class="hidden md:flex items-center gap-12">
             <a href="feed.html" class="text-blue-500 border-b-2 border-blue-500 pb-1"><i class="fas fa-home text-2xl"></i></a>
             <a href="profile.html" class="text-gray-400 hover:text-gray-200 transition"><i class="fas fa-user text-2xl"></i></a>
             <button class="text-gray-400 hover:text-gray-200 transition"><i class="fas fa-bell text-2xl"></i></button>
         </div>
-
-        <!-- Right Menu (Simplified) -->
         <div class="flex items-center gap-3">
-            <!-- Profile Dropdown Trigger -->
             <div class="relative group">
                 <img src="assets/img/default_profile.png" id="navProfilePic" alt="Profile" class="w-10 h-10 rounded-full object-cover border-2 border-gray-700 cursor-pointer">
             </div>
@@ -69,8 +53,8 @@
     <!-- Main Content -->
     <div class="flex-1 flex pt-16 overflow-hidden bg-gray-900">
         
-        <!-- Left Sidebar (Shortcuts) -->
-        <div class="hidden lg:flex flex-col w-1/4 p-4 overflow-y-auto no-scrollbar hover:overflow-y-auto">
+        <!-- Left Sidebar -->
+        <div class="hidden lg:flex flex-col w-1/4 p-4 overflow-y-auto no-scrollbar">
             <div class="space-y-2">
                 <a href="profile.html" class="flex items-center gap-3 p-3 hover:bg-gray-800 rounded-xl transition cursor-pointer">
                     <img src="assets/img/default_profile.png" id="sidebarProfilePic" class="w-8 h-8 rounded-full object-cover">
@@ -95,10 +79,10 @@
                 <div class="glass-panel rounded-xl p-4">
                     <div class="flex gap-3 mb-4">
                         <img src="assets/img/default_profile.png" id="createPostProfilePic" class="w-10 h-10 rounded-full object-cover">
-                        <input type="text" placeholder="¿Qué estás pensando?" class="flex-1 bg-gray-800/50 rounded-full px-4 focus:outline-none hover:bg-gray-800 transition cursor-pointer text-gray-300">
+                        <input type="text" onclick="openCreatePostModal()" readonly placeholder="¿Qué estás pensando?" class="flex-1 bg-gray-800/50 rounded-full px-4 focus:outline-none hover:bg-gray-800 transition cursor-pointer text-gray-300">
                     </div>
                     <div class="border-t border-gray-700 pt-3 flex justify-start px-4">
-                        <button class="flex items-center gap-2 text-gray-400 hover:bg-gray-800 px-4 py-2 rounded-lg transition">
+                        <button onclick="openCreatePostModal()" class="flex items-center gap-2 text-gray-400 hover:bg-gray-800 px-4 py-2 rounded-lg transition">
                             <i class="fas fa-image text-green-500"></i>
                             <span class="text-sm font-medium">Imagen</span>
                         </button>
@@ -107,155 +91,58 @@
 
                 <!-- Posts Feed Container -->
                 <div id="feedContainer" class="space-y-6">
-                    <!-- Example Post (Static for UI Demo) -->
-                    <div class="glass-panel rounded-xl p-4 animate-fade-in">
-                        <!-- Post Header -->
-                        <div class="flex items-center justify-between mb-4">
-                            <div class="flex items-center gap-3">
-                                <img src="assets/img/default_profile.png" class="w-10 h-10 rounded-full object-cover border border-gray-600">
-                                <div>
-                                    <h4 class="font-semibold text-sm">Administrador</h4>
-                                    <p class="text-xs text-gray-400">Hace 2 horas <i class="fas fa-globe-americas ml-1"></i></p>
-                                </div>
-                            </div>
-                            <button class="text-gray-400 hover:bg-gray-800 p-2 rounded-full transition"><i class="fas fa-ellipsis-h"></i></button>
-                        </div>
-                        
-                        <!-- Post Content -->
-                        <p class="text-gray-200 mb-4 text-sm leading-relaxed">
-                            ¡Bienvenidos a Quórum! Esta es la primera publicación de nuestra nueva red social. Estamos emocionados de tenerlos aquí.
-                        </p>
-                        
-                        <!-- Post Image (Optional) -->
-                        <div class="rounded-lg overflow-hidden mb-4 border border-gray-700">
-                            <img src="https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?q=80&w=1000&auto=format&fit=crop" class="w-full h-auto object-cover">
-                        </div>
-
-                        <!-- Post Stats -->
-                        <div class="flex justify-end items-center text-gray-400 text-sm mb-3 px-1">
-                            <div class="flex gap-3">
-                                <span>3 comentarios</span>
-                            </div>
-                        </div>
-
-                        <!-- Action Buttons -->
-                        <div class="flex justify-between border-t border-b border-gray-700 py-1 mb-4">
-                            <button class="flex-1 flex items-center justify-center gap-2 py-2 text-gray-400 hover:bg-gray-800 rounded-lg transition">
-                                <i class="far fa-comment-alt"></i> <span class="text-sm font-medium">Comentar</span>
-                            </button>
-                        </div>
-
-                        <!-- Comments Section -->
-                        <div class="space-y-3">
-                            <!-- Comment Input -->
-                            <div class="flex gap-2 items-start">
-                                <img src="assets/img/default_profile.png" class="w-8 h-8 rounded-full object-cover">
-                                <div class="flex-1 relative">
-                                    <input type="text" placeholder="Escribe un comentario..." class="w-full bg-gray-800/50 rounded-2xl py-2 px-4 text-sm focus:outline-none text-gray-300 border border-transparent focus:border-gray-600">
-                                    <button class="absolute right-3 top-2 text-blue-400 text-xs font-semibold hover:text-blue-300">PUBLICAR</button>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
+                    <div class="text-center text-gray-500 py-10">Cargando publicaciones...</div>
                 </div>
             </div>
         </div>
-
-
-
     </div>
 
-    <script>
-        // Placeholder for future logic
-        function logout() {
-            // Clear session and redirect
-            localStorage.removeItem('user_session'); // Example
-            window.location.href = 'Index.html';
-        }
-
-        function switchAccount() {
-            Swal.fire({
-                title: 'Próximamente',
-                text: 'La funcionalidad de cambiar cuenta estará disponible pronto.',
-                icon: 'info',
-                background: '#1f2937',
-                color: '#fff',
-                confirmButtonColor: '#3b82f6'
-            });
-        }
-
-        // Load user info
-        document.addEventListener('DOMContentLoaded', async () => {
-            let user = JSON.parse(localStorage.getItem('quorum_user'));
+    <!-- Create Post Modal -->
+    <div id="createPostModal" class="fixed inset-0 z-50 hidden flex items-center justify-center bg-black/80 backdrop-blur-sm">
+        <div class="glass-panel w-full max-w-lg rounded-2xl p-6 relative m-4">
+            <div class="flex justify-between items-center mb-4">
+                <h2 class="text-xl font-bold">Crear publicación</h2>
+                <button onclick="closeCreatePostModal()" class="text-gray-400 hover:text-white">
+                    <i class="fas fa-times text-xl"></i>
+                </button>
+            </div>
             
-            if (user) {
-                // Immediately show what we have
-                updateUserUI(user);
-
-                // Fetch fresh data from DB
-                try {
-                    const response = await fetch(`api/get_profile.php?user_id=${user.id}`);
-                    if (response.ok) {
-                        const freshUser = await response.json();
-                        // Update localStorage
-                        user = { ...user, ...freshUser };
-                        localStorage.setItem('quorum_user', JSON.stringify(user));
-                        // Update UI with fresh data
-                        updateUserUI(user);
-                    }
-                } catch (error) {
-                    console.error('Error fetching fresh user data:', error);
-                }
-            } else {
-                window.location.href = 'Index.html';
-            }
-        });
-
-        function updateUserUI(user) {
-            if (document.getElementById('sidebarUserName')) {
-                document.getElementById('sidebarUserName').innerText = user.nombre;
-            }
-            
-            if (user.foto_perfil && user.foto_perfil !== 'default_profile.png') {
-                const src = user.foto_perfil.startsWith('data:') ? user.foto_perfil : `assets/img/${user.foto_perfil}`;
-                const pics = ['navProfilePic', 'sidebarProfilePic', 'createPostProfilePic'];
-                pics.forEach(id => {
-                    const el = document.getElementById(id);
-                    if (el) el.src = src;
-                });
-            }
-        }
-
-        // Toast Helper Function
-        function showToast(message, type = 'info') {
-            const toastContainer = document.getElementById('toastContainer');
-            const toastId = 'toast-' + Date.now();
-            
-            const bgColor = type === 'success' ? 'bg-success' : type === 'error' ? 'bg-danger' : 'bg-info';
-            
-            const toastHTML = `
-                <div id="${toastId}" class="toast align-items-center text-white ${bgColor} border-0" role="alert" aria-live="assertive" aria-atomic="true">
-                    <div class="d-flex">
-                        <div class="toast-body">
-                            ${message}
-                        </div>
-                        <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>
-                    </div>
+            <div class="flex items-center gap-3 mb-4 pb-4 border-b border-gray-700">
+                <img src="assets/img/default_profile.png" id="modalProfilePic" class="w-10 h-10 rounded-full object-cover">
+                <div>
+                    <p class="font-semibold" id="modalUserName">Usuario</p>
                 </div>
-            `;
-            
-            toastContainer.insertAdjacentHTML('beforeend', toastHTML);
-            const toastElement = document.getElementById(toastId);
-            const toast = new bootstrap.Toast(toastElement, { delay: 3000 });
-            toast.show();
-            
-            toastElement.addEventListener('hidden.bs.toast', () => {
-                toastElement.remove();
-            });
-        }
-    </script>
+            </div>
+
+            <form id="createPostForm">
+                <textarea id="postContent" rows="4" placeholder="¿Qué estás pensando?" class="w-full bg-gray-800/50 border border-gray-600 rounded-lg px-4 py-3 text-white focus:outline-none focus:border-blue-500 resize-none mb-3"></textarea>
+                
+                <!-- Image Preview -->
+                <div id="imagePreviewContainer" class="hidden mb-3 relative">
+                    <img id="imagePreview" class="w-full rounded-lg border border-gray-700">
+                    <button type="button" onclick="removeImage()" class="absolute top-2 right-2 bg-gray-900/80 hover:bg-gray-700 p-2 rounded-full">
+                        <i class="fas fa-times text-white"></i>
+                    </button>
+                </div>
+
+                <div class="border border-gray-600 rounded-lg p-3 mb-4">
+                    <label for="postImage" class="flex items-center gap-2 cursor-pointer text-gray-300 hover:text-white">
+                        <i class="fas fa-image text-green-500 text-xl"></i>
+                        <span class="text-sm font-medium">Agregar imagen</span>
+                    </label>
+                    <input type="file" id="postImage" class="hidden" accept="image/*">
+                </div>
+
+                <button type="submit" id="submitPostBtn" class="w-full bg-blue-600 hover:bg-blue-500 py-3 rounded-lg font-bold transition">
+                    Publicar
+                </button>
+            </form>
+        </div>
+    </div>
+
     <!-- Toast Container -->
     <div class="toast-container position-fixed bottom-0 end-0 p-3" id="toastContainer"></div>
 
+    <script src="js/feed.js"></script>
 </body>
 </html>
