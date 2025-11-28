@@ -293,9 +293,21 @@
         // Load Posts (Mockup for now, similar to feed but filtered)
         async function loadUserPosts() {
             const container = document.getElementById('userPostsContainer');
+            container.innerHTML = '<div class="text-center text-gray-500 py-10">Cargando publicaciones...</div>';
+            
             try {
+                console.log('Cargando publicaciones para user.id:', user.id);
                 const response = await fetch(`api/get_posts.php?user_id=${user.id}`);
+                console.log('Response status:', response.status);
+                
+                if (!response.ok) {
+                    const errorText = await response.text();
+                    console.error('Error response:', errorText);
+                    throw new Error(`HTTP ${response.status}: ${errorText}`);
+                }
+                
                 const posts = await response.json();
+                console.log('Posts loaded:', posts);
                 
                 container.innerHTML = '';
                 
