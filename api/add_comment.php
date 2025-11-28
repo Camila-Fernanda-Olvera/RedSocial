@@ -21,6 +21,27 @@ if (!empty($data->post_id) && !empty($data->user_id) && !empty($data->content)) 
         $stmt->bindParam(":content", $data->content);
 
         if ($stmt->execute()) {
+            $comment_id = $db->lastInsertId();
+
+            // Get post owner to create notification
+            $postQuery = "SELECT user_id FROM posts WHERE id = :post_id";
+            $postStmt = $db->prepare($postQuery);
+            $postStmt->bindParam(":post_id", $data->post_id);
+            $postStmt->execute();
+            $post = $postStmt->fetch(PDO::FETCH_ASSOC);
+
+            // Create notification only if commenter is not the post owner
+            if ($post && $post['user_id'] != $data->user_id) {
+                $notifQuery = "INSERT INTO notifications (user_id, post_id, commenter_id, comment_id, type) 
+                              VALUES (:user_id, :post_id, :commenter_id, :comment_id, 'comment')";
+                $notifStmt = $db->prepare($notifQuery);
+                $notifStmt->bindParam(":user_id", $post['user_id']);
+                $notifStmt->bindParam(":post_id", $data->post_id);
+                $notifStmt->bindParam(":commenter_id", $data->user_id);
+                $notifStmt->bindParam(":comment_id", $comment_id);
+                $notifStmt->execute();
+            }
+
             http_response_code(201);
             echo json_encode(["message" => "Comentario agregado."]);
         } else {

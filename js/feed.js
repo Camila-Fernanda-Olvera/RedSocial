@@ -15,6 +15,9 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     // Load feed
     await loadFeed();
+
+    // Start notification polling
+    startNotificationPolling();
 });
 
 // Update user UI elements

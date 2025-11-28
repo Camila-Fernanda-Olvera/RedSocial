@@ -41,11 +41,24 @@
         <div class="hidden md:flex items-center gap-12">
             <a href="feed.html" class="text-blue-500 border-b-2 border-blue-500 pb-1"><i class="fas fa-home text-2xl"></i></a>
             <a href="profile.html" class="text-gray-400 hover:text-gray-200 transition"><i class="fas fa-user text-2xl"></i></a>
-            <button class="text-gray-400 hover:text-gray-200 transition"><i class="fas fa-bell text-2xl"></i></button>
+            <button onclick="toggleNotifications()" class="text-gray-400 hover:text-gray-200 transition relative">
+                <i class="fas fa-bell text-2xl"></i>
+                <span id="notificationBadge" class="hidden absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center font-bold">0</span>
+            </button>
         </div>
         <div class="flex items-center gap-3">
             <div class="relative group">
                 <img src="assets/img/default_profile.png" id="navProfilePic" alt="Profile" class="w-10 h-10 rounded-full object-cover border-2 border-gray-700 cursor-pointer">
+            </div>
+        </div>
+        
+        <!-- Notifications Panel -->
+        <div id="notificationsPanel" class="hidden absolute top-16 right-4 w-96 bg-gray-800 rounded-xl shadow-2xl border border-gray-700 z-50">
+            <div class="p-4 border-b border-gray-700">
+                <h3 class="font-bold text-lg">Notificaciones</h3>
+            </div>
+            <div id="notificationsContainer" class="max-h-96 overflow-y-auto">
+                <div class="text-center text-gray-500 py-4 text-sm">Cargando...</div>
             </div>
         </div>
     </nav>
@@ -143,6 +156,7 @@
     <!-- Toast Container -->
     <div class="toast-container position-fixed bottom-0 end-0 p-3" id="toastContainer"></div>
 
+    <script src="js/notifications.js"></script>
     <script src="js/feed.js"></script>
 </body>
 </html>
