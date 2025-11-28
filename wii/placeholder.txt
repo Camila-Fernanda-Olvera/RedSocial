@@ -18,3 +18,4 @@ comentarios: establecer tiempo límite de comentarios - Fecha: 2025-11-27 23:01:1
 notificaciones: crear tabla de notificaciones - Fecha: 2025-11-27 23:24:40
 notificaciones: implementar api de notificaciones - Fecha: 2025-11-27 23:24:40
 notificaciones: agregar interfaz de usuario para notificaciones - Fecha: 2025-11-27 23:24:41
+notificaciones: marcar notificaciones como leídas - Fecha: 2025-11-27 23:24:41
