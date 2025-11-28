@@ -57,27 +57,39 @@
     </nav>
 
     <!-- Main Content -->
-    <div class="flex-1 flex pt-16 overflow-hidden bg-gray-900">
-        <div class="flex-1 overflow-y-auto no-scrollbar">
-            <!-- Cover Photo -->
-            <div class="h-48 bg-gradient-to-r from-purple-900 via-blue-900 to-pink-900 relative">
-                <img id="coverPhoto" src="" class="w-full h-full object-cover hidden">
-            </div>
-
+    <div class="flex-1 flex pt-16 overflow-y-auto no-scrollbar justify-center bg-gray-900">
+        <div class="w-full max-w-4xl pb-10">
+            
             <!-- Profile Header -->
-            <div class="max-w-4xl mx-auto px-4 -mt-20 mb-6">
-                <div class="flex items-end gap-6 mb-4">
-                    <img id="profilePhoto" src="assets/img/default_profile.png" class="w-40 h-40 rounded-full border-4 border-gray-900 object-cover">
-                    <div class="flex-1 pb-2">
-                        <h2 id="userName" class="text-3xl font-bold mb-1">Usuario</h2>
-                        <p id="userDesc" class="text-gray-400">Sin descripción</p>
+            <div class="relative mb-4">
+                <!-- Cover Photo -->
+                <div class="h-64 w-full bg-gray-800 relative">
+                    <img id="coverPhoto" src="assets/img/default_cover.png" class="w-full h-full object-cover">
+                </div>
+
+                <!-- Profile Info Container -->
+                <div class="px-8 pb-4 relative">
+                    <!-- Profile Pic -->
+                    <div class="absolute -top-16 left-8">
+                        <div class="relative">
+                            <img id="profilePhoto" src="assets/img/default_profile.png" class="w-40 h-40 rounded-full object-cover border-4 border-gray-900 bg-gray-800">
+                        </div>
+                    </div>
+
+                    <!-- Name & Bio -->
+                    <div class="ml-44 pt-2 flex justify-between items-start">
+                        <div>
+                            <h1 class="text-3xl font-bold" id="userName">Cargando...</h1>
+                            <p class="text-gray-400 mt-1 max-w-lg" id="userDesc">Sin descripción</p>
+                        </div>
+                        <!-- No edit button here -->
                     </div>
                 </div>
             </div>
 
             <!-- Posts Section -->
-            <div class="max-w-4xl mx-auto px-4 pb-8">
-                <h3 class="text-xl font-bold mb-4">Publicaciones</h3>
+            <div class="px-8">
+                <h3 class="text-xl font-bold mb-4 border-b border-gray-800 pb-2">Publicaciones</h3>
                 <div id="userPostsContainer" class="space-y-4">
                     <div class="text-center text-gray-500 py-10">Cargando publicaciones...</div>
                 </div>
