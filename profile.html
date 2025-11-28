@@ -285,7 +285,7 @@
                 }
 
                 posts.forEach(post => {
-                    // Render post (simplified version of feed render)
+                    // Render post
                     const postHTML = `
                         <div class="glass-panel rounded-xl p-4">
                             <div class="flex items-center justify-between mb-4">
@@ -293,9 +293,10 @@
                                     <img src="${post.foto_perfil.startsWith('data:') ? post.foto_perfil : 'assets/img/' + post.foto_perfil}" class="w-10 h-10 rounded-full object-cover">
                                     <div>
                                         <h4 class="font-semibold text-sm">${post.nombre}</h4>
-                                        <p class="text-xs text-gray-400">${new Date(post.created_at).toLocaleDateString()}</p>
+                                        <p class="text-xs text-gray-400">${formatDate(post.created_at)}</p>
                                     </div>
                                 </div>
+                                <button onclick="deletePost(${post.id})" class="text-gray-400 hover:text-red-400 p-2 rounded-full transition" title="Eliminar publicación"><i class="fas fa-trash"></i></button>
                             </div>
                             <p class="text-gray-200 mb-4 text-sm leading-relaxed">${post.content || ''}</p>
                             ${post.image ? `<div class="rounded-lg overflow-hidden mb-4 border border-gray-700"><img src="${post.image}" class="w-full h-auto object-cover"></div>` : ''}
@@ -303,7 +304,9 @@
                             <!-- Post Stats -->
                             <div class="flex justify-end items-center text-gray-400 text-sm mb-3 px-1">
                                 <div class="flex gap-3">
-                                    <span>${post.comments ? post.comments.length : 0} comentarios</span>
+                                    <button onclick="toggleComments(${post.id})" class="hover:text-blue-400 transition cursor-pointer">
+                                        ${post.comments ? post.comments.length : 0} comentario${(post.comments && post.comments.length !== 1) ? 's' : ''}
+                                    </button>
                                 </div>
                             </div>
 
@@ -319,9 +322,10 @@
                                 ${post.comments ? post.comments.map(c => `
                                     <div class="flex gap-2 items-start">
                                         <img src="${c.foto_perfil && c.foto_perfil.startsWith('data:') ? c.foto_perfil : 'assets/img/' + (c.foto_perfil || 'default_profile.png')}" class="w-8 h-8 rounded-full object-cover">
-                                        <div class="bg-gray-800 rounded-2xl px-4 py-2">
+                                        <div class="bg-gray-800 rounded-2xl px-4 py-2 flex-1">
                                             <p class="font-bold text-xs text-gray-300">${c.nombre}</p>
                                             <p class="text-sm text-gray-200">${c.content}</p>
+                                            <p class="text-xs text-gray-500 mt-1">${formatDate(c.created_at)}</p>
                                         </div>
                                     </div>
                                 `).join('') : ''}
@@ -381,18 +385,6 @@
                         title: 'Error',
                         text: 'Error al publicar comentario',
                         background: '#1f2937',
-                        color: '#fff',
-                        confirmButtonColor: '#3b82f6'
-                    });
-                }
-            } catch (error) {
-                console.error('Error:', error);
-            }
-        }
-
-        // Toast Helper Function
-        function showToast(message, type = 'info') {
-            const toastContainer = document.getElementById('toastContainer');
             const toastId = 'toast-' + Date.now();
             
             const bgColor = type === 'success' ? 'bg-success' : type === 'error' ? 'bg-danger' : 'bg-info';
