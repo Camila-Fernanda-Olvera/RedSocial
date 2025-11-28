@@ -78,6 +78,8 @@ function renderPost(post) {
     const userPhoto = post.foto_perfil && post.foto_perfil.startsWith('data:') ? post.foto_perfil : `assets/img/${post.foto_perfil || 'default_profile.png'}`;
     const postImage = post.image ? `<div class="rounded-lg overflow-hidden mb-4 border border-gray-700"><img src="${post.image}" class="w-full h-auto object-cover"></div>` : '';
     const commentsHTML = post.comments ? post.comments.map(c => renderComment(c)).join('') : '';
+    const isOwnPost = post.user_id === currentUser.id;
+    const deleteButton = isOwnPost ? `<button onclick="deletePost(${post.id})" class="text-gray-400 hover:text-red-400 p-2 rounded-full transition" title="Eliminar publicación"><i class="fas fa-trash"></i></button>` : '';
 
     return `
         <div class="glass-panel rounded-xl p-4">
@@ -89,6 +91,7 @@ function renderPost(post) {
                         <p class="text-xs text-gray-400">${formatDate(post.created_at)}</p>
                     </div>
                 </div>
+                ${deleteButton}
             </div>
             
             ${post.content ? `<p class="text-gray-200 mb-4 text-sm leading-relaxed">${post.content}</p>` : ''}
@@ -96,7 +99,9 @@ function renderPost(post) {
 
             <div class="flex justify-end items-center text-gray-400 text-sm mb-3 px-1">
                 <div class="flex gap-3">
-                    <span>${post.comments ? post.comments.length : 0} comentarios</span>
+                    <button onclick="toggleComments(${post.id})" class="hover:text-blue-400 transition cursor-pointer">
+                        ${post.comments ? post.comments.length : 0} comentario${(post.comments && post.comments.length !== 1) ? 's' : ''}
+                    </button>
                 </div>
             </div>
 
@@ -332,6 +337,61 @@ function showToast(message, type = 'info') {
     toast.show();
 
     toastElement.addEventListener('hidden.bs.toast', () => toastElement.remove());
+}
+
+// Delete post function
+async function deletePost(postId) {
+    const result = await Swal.fire({
+        title: '¿Eliminar publicación?',
+        text: 'Esta acción no se puede deshacer',
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonColor: '#ef4444',
+        cancelButtonColor: '#6b7280',
+        confirmButtonText: 'Sí, eliminar',
+        cancelButtonText: 'Cancelar',
+        background: '#1f2937',
+        color: '#fff'
+    });
+
+    if (result.isConfirmed) {
+        try {
+            const response = await fetch('api/delete_post.php', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    post_id: postId,
+                    user_id: currentUser.id
+                })
+            });
+
+            const data = await response.json();
+
+            if (response.ok) {
+                showToast('Publicación eliminada', 'success');
+                await loadFeed();
+            } else {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Error',
+                    text: data.message || 'No se pudo eliminar la publicación',
+                    background: '#1f2937',
+                    color: '#fff',
+                    confirmButtonColor: '#3b82f6'
+                });
+            }
+        } catch (error) {
+            console.error('Error:', error);
+            Swal.fire({
+                icon: 'error',
+                title: 'Error',
+                text: 'Error de red al eliminar la publicación',
+                background: '#1f2937',
+                color: '#fff',
+                confirmButtonColor: '#3b82f6'
+            });
+        }
+    }
 }
 
 // Utility functions
