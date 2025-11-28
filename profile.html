@@ -110,10 +110,10 @@
                     <div class="glass-panel rounded-xl p-4">
                         <div class="flex gap-3 mb-4">
                             <img src="assets/img/default_profile.png" id="createPostProfilePic" class="w-10 h-10 rounded-full object-cover">
-                            <input type="text" placeholder="¿Qué estás pensando?" class="flex-1 bg-gray-800/50 rounded-full px-4 focus:outline-none hover:bg-gray-800 transition cursor-pointer text-gray-300">
+                            <input type="text" onclick="openCreatePostModal()" readonly placeholder="¿Qué estás pensando?" class="flex-1 bg-gray-800/50 rounded-full px-4 focus:outline-none hover:bg-gray-800 transition cursor-pointer text-gray-300">
                         </div>
                         <div class="border-t border-gray-700 pt-3 flex justify-start px-4">
-                            <button class="flex items-center gap-2 text-gray-400 hover:bg-gray-800 px-4 py-2 rounded-lg transition">
+                            <button onclick="openCreatePostModal()" class="flex items-center gap-2 text-gray-400 hover:bg-gray-800 px-4 py-2 rounded-lg transition">
                                 <i class="fas fa-image text-green-500"></i>
                                 <span class="text-sm font-medium">Imagen</span>
                             </button>
@@ -127,6 +127,49 @@
                     </div>
                 </div>
             </div>
+        </div>
+    </div>
+
+    <!-- Create Post Modal -->
+    <div id="createPostModal" class="fixed inset-0 z-50 hidden flex items-center justify-center bg-black/80 backdrop-blur-sm">
+        <div class="glass-panel w-full max-w-lg rounded-2xl p-6 relative m-4">
+            <div class="flex justify-between items-center mb-4">
+                <h2 class="text-xl font-bold">Crear publicación</h2>
+                <button onclick="closeCreatePostModal()" class="text-gray-400 hover:text-white">
+                    <i class="fas fa-times text-xl"></i>
+                </button>
+            </div>
+            
+            <div class="flex items-center gap-3 mb-4 pb-4 border-b border-gray-700">
+                <img src="assets/img/default_profile.png" id="modalProfilePic" class="w-10 h-10 rounded-full object-cover">
+                <div>
+                    <p class="font-semibold" id="modalUserName">Usuario</p>
+                </div>
+            </div>
+
+            <form id="createPostForm">
+                <textarea id="postContent" rows="4" placeholder="¿Qué estás pensando?" class="w-full bg-gray-800/50 border border-gray-600 rounded-lg px-4 py-3 text-white focus:outline-none focus:border-blue-500 resize-none mb-3"></textarea>
+                
+                <!-- Image Preview -->
+                <div id="imagePreviewContainer" class="hidden mb-3 relative">
+                    <img id="imagePreview" class="w-full rounded-lg border border-gray-700">
+                    <button type="button" onclick="removeImage()" class="absolute top-2 right-2 bg-gray-900/80 hover:bg-gray-700 p-2 rounded-full">
+                        <i class="fas fa-times text-white"></i>
+                    </button>
+                </div>
+
+                <div class="border border-gray-600 rounded-lg p-3 mb-4">
+                    <label for="postImage" class="flex items-center gap-2 cursor-pointer text-gray-300 hover:text-white">
+                        <i class="fas fa-image text-green-500 text-xl"></i>
+                        <span class="text-sm font-medium">Agregar imagen</span>
+                    </label>
+                    <input type="file" id="postImage" class="hidden" accept="image/*">
+                </div>
+
+                <button type="submit" id="submitPostBtn" class="w-full bg-blue-600 hover:bg-blue-500 py-3 rounded-lg font-bold transition">
+                    Publicar
+                </button>
+            </form>
         </div>
     </div>
 
@@ -451,6 +494,96 @@
                 toastElement.remove();
             });
         }
+
+        }
+
+        // Create Post Functions
+        function openCreatePostModal() {
+            const user = JSON.parse(localStorage.getItem('quorum_user'));
+            if (user) {
+                document.getElementById('modalUserName').textContent = user.nombre;
+                const profilePic = user.foto_perfil && user.foto_perfil.startsWith('data:') ? user.foto_perfil : `assets/img/${user.foto_perfil || 'default_profile.png'}`;
+                document.getElementById('modalProfilePic').src = profilePic;
+            }
+            document.getElementById('createPostModal').classList.remove('hidden');
+        }
+
+        function closeCreatePostModal() {
+            document.getElementById('createPostModal').classList.add('hidden');
+            document.getElementById('createPostForm').reset();
+            removeImage();
+        }
+
+        // Image Preview Logic
+        document.getElementById('postImage').addEventListener('change', function(e) {
+            const file = e.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    document.getElementById('imagePreview').src = e.target.result;
+                    document.getElementById('imagePreviewContainer').classList.remove('hidden');
+                }
+                reader.readAsDataURL(file);
+            }
+        });
+
+        function removeImage() {
+            document.getElementById('postImage').value = '';
+            document.getElementById('imagePreviewContainer').classList.add('hidden');
+            document.getElementById('imagePreview').src = '';
+        }
+
+        // Submit Post
+        document.getElementById('createPostForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const content = document.getElementById('postContent').value.trim();
+            const imageInput = document.getElementById('postImage');
+            const submitBtn = document.getElementById('submitPostBtn');
+            
+            if (!content && !imageInput.files[0]) {
+                showToast('Escribe algo o sube una imagen', 'error');
+                return;
+            }
+
+            submitBtn.disabled = true;
+            submitBtn.textContent = 'Publicando...';
+
+            try {
+                let imageData = null;
+                if (imageInput.files[0]) {
+                    imageData = await new Promise((resolve) => {
+                        const reader = new FileReader();
+                        reader.onload = (e) => resolve(e.target.result);
+                        reader.readAsDataURL(imageInput.files[0]);
+                    });
+                }
+
+                const response = await fetch('api/create_post.php', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        user_id: user.id,
+                        content: content,
+                        image: imageData
+                    })
+                });
+
+                if (response.ok) {
+                    showToast('Publicación creada exitosamente', 'success');
+                    closeCreatePostModal();
+                    loadUserPosts(); // Reload posts
+                } else {
+                    throw new Error('Error al crear la publicación');
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                showToast('Error al publicar. Intenta de nuevo.', 'error');
+            } finally {
+                submitBtn.disabled = false;
+                submitBtn.textContent = 'Publicar';
+            }
+        });
 
        async function deleteAccountProfile() {
     const result = await Swal.fire({
