@@ -174,26 +174,47 @@
             alert('Funcionalidad de cambiar cuenta próximamente.');
         }
 
-        // Load user info (Mockup)
-        document.addEventListener('DOMContentLoaded', () => {
-            const user = JSON.parse(localStorage.getItem('quorum_user'));
+        // Load user info
+        document.addEventListener('DOMContentLoaded', async () => {
+            let user = JSON.parse(localStorage.getItem('quorum_user'));
+            
             if (user) {
-                // document.getElementById('navUserName').innerText = user.nombre; // Element removed
-                if (document.getElementById('sidebarUserName')) {
-                    document.getElementById('sidebarUserName').innerText = user.nombre;
+                // Immediately show what we have
+                updateUserUI(user);
+
+                // Fetch fresh data from DB
+                try {
+                    const response = await fetch(`api/get_profile.php?user_id=${user.id}`);
+                    if (response.ok) {
+                        const freshUser = await response.json();
+                        // Update localStorage
+                        user = { ...user, ...freshUser };
+                        localStorage.setItem('quorum_user', JSON.stringify(user));
+                        // Update UI with fresh data
+                        updateUserUI(user);
+                    }
+                } catch (error) {
+                    console.error('Error fetching fresh user data:', error);
                 }
-                
-                // Update profile pics
-                if (user.foto_perfil && user.foto_perfil !== 'default_profile.png') {
-                    const src = user.foto_perfil.startsWith('data:') ? user.foto_perfil : `assets/img/${user.foto_perfil}`;
-                    const pics = ['navProfilePic', 'sidebarProfilePic', 'createPostProfilePic'];
-                    pics.forEach(id => {
-                        const el = document.getElementById(id);
-                        if (el) el.src = src;
-                    });
-                }
+            } else {
+                window.location.href = 'Index.html';
             }
         });
+
+        function updateUserUI(user) {
+            if (document.getElementById('sidebarUserName')) {
+                document.getElementById('sidebarUserName').innerText = user.nombre;
+            }
+            
+            if (user.foto_perfil && user.foto_perfil !== 'default_profile.png') {
+                const src = user.foto_perfil.startsWith('data:') ? user.foto_perfil : `assets/img/${user.foto_perfil}`;
+                const pics = ['navProfilePic', 'sidebarProfilePic', 'createPostProfilePic'];
+                pics.forEach(id => {
+                    const el = document.getElementById(id);
+                    if (el) el.src = src;
+                });
+            }
+        }
     </script>
 </body>
 </html>
