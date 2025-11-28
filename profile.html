@@ -287,9 +287,31 @@
 
                             <!-- Action Buttons -->
                             <div class="flex justify-between border-t border-b border-gray-700 py-1 mb-4">
-                                <button class="flex-1 flex items-center justify-center gap-2 py-2 text-gray-400 hover:bg-gray-800 rounded-lg transition">
+                                <button class="flex-1 flex items-center justify-center gap-2 py-2 text-gray-400 hover:bg-gray-800 rounded-lg transition" onclick="toggleComments(${post.id})">
                                     <i class="far fa-comment-alt"></i> <span class="text-sm font-medium">Comentar</span>
                                 </button>
+                            </div>
+
+                            <!-- Comments Section -->
+                            <div id="comments-${post.id}" class="space-y-3 hidden">
+                                ${post.comments ? post.comments.map(c => `
+                                    <div class="flex gap-2 items-start">
+                                        <img src="${c.foto_perfil && c.foto_perfil.startsWith('data:') ? c.foto_perfil : 'assets/img/' + (c.foto_perfil || 'default_profile.png')}" class="w-8 h-8 rounded-full object-cover">
+                                        <div class="bg-gray-800 rounded-2xl px-4 py-2">
+                                            <p class="font-bold text-xs text-gray-300">${c.nombre}</p>
+                                            <p class="text-sm text-gray-200">${c.content}</p>
+                                        </div>
+                                    </div>
+                                `).join('') : ''}
+                                
+                                <!-- Comment Input -->
+                                <div class="flex gap-2 items-start mt-3">
+                                    <img src="${user.foto_perfil && user.foto_perfil.startsWith('data:') ? user.foto_perfil : 'assets/img/' + (user.foto_perfil || 'default_profile.png')}" class="w-8 h-8 rounded-full object-cover">
+                                    <div class="flex-1 relative">
+                                        <input type="text" id="input-comment-${post.id}" placeholder="Escribe un comentario..." class="w-full bg-gray-800/50 rounded-2xl py-2 px-4 text-sm focus:outline-none text-gray-300 border border-transparent focus:border-gray-600" onkeypress="handleComment(event, ${post.id})">
+                                        <button class="absolute right-3 top-2 text-blue-400 text-xs font-semibold hover:text-blue-300" onclick="submitComment(${post.id})">PUBLICAR</button>
+                                    </div>
+                                </div>
                             </div>
                         </div>
                     `;
@@ -297,6 +319,44 @@
                 });
             } catch (error) {
                 container.innerHTML = '<div class="text-center text-red-400 py-10">Error al cargar publicaciones.</div>';
+            }
+        }
+
+        function toggleComments(postId) {
+            const el = document.getElementById(`comments-${postId}`);
+            el.classList.toggle('hidden');
+        }
+
+        async function handleComment(e, postId) {
+            if (e.key === 'Enter') {
+                await submitComment(postId);
+            }
+        }
+
+        async function submitComment(postId) {
+            const input = document.getElementById(`input-comment-${postId}`);
+            const content = input.value.trim();
+            if (!content) return;
+
+            try {
+                const response = await fetch('api/add_comment.php', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        post_id: postId,
+                        user_id: user.id,
+                        content: content
+                    })
+                });
+
+                if (response.ok) {
+                    input.value = '';
+                    loadUserPosts(); // Reload to show new comment
+                } else {
+                    alert('Error al publicar comentario');
+                }
+            } catch (error) {
+                console.error('Error:', error);
             }
         }
     </script>
