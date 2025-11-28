@@ -11,3 +11,4 @@ Commit automático: social: conexión creada - Fecha: 2025-11-27 20:07:33 - Auto
 Commit automático: social: nuevo seguidor - Fecha: 2025-11-27 21:51:51 - Autor: vickyjuarez
 Commit automático: login: cierre de sesión - Fecha: 2025-11-27 22:22:04 - Autor: vickyjuarez
 Commit automático: social: conexión creada - Fecha: 2025-11-27 22:34:39 - Autor: vickyjuarez
+Commit automático: social: actualización de perfil - Fecha: 2025-11-27 22:50:29 - Autor: vickyjuarez
