@@ -1,0 +1,279 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Perfil - Quórum</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <style>
+        .glass-nav {
+            background: rgba(17, 24, 39, 0.9);
+            backdrop-filter: blur(20px);
+            border-bottom: 1px solid rgba(75, 85, 99, 0.3);
+        }
+        .glass-panel {
+            background: rgba(31, 41, 55, 0.7);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(75, 85, 99, 0.3);
+        }
+        .no-scrollbar::-webkit-scrollbar { display: none; }
+        .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+    </style>
+</head>
+<body class="bg-gray-900 text-white h-screen overflow-hidden flex flex-col">
+
+    <!-- Navbar (Same as Feed) -->
+    <nav class="glass-nav w-full z-50 px-4 py-3 flex justify-between items-center fixed top-0">
+        <div class="flex items-center gap-4">
+            <h1 class="text-2xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-blue-400 to-pink-400">Quórum</h1>
+        </div>
+        <div class="hidden md:flex items-center gap-12">
+            <a href="feed.html" class="text-gray-400 hover:text-gray-200 transition"><i class="fas fa-home text-2xl"></i></a>
+            <a href="profile.html" class="text-gray-400 hover:text-gray-200 transition"><i class="fas fa-user text-2xl"></i></a>
+            <button onclick="toggleNotifications()" class="text-gray-400 hover:text-gray-200 transition relative">
+                <i class="fas fa-bell text-2xl"></i>
+                <span id="notificationBadge" class="hidden absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center font-bold">0</span>
+            </button>
+        </div>
+        <div class="flex items-center gap-3">
+            <div class="relative group">
+                <img src="assets/img/default_profile.png" id="navProfilePic" alt="Profile" class="w-10 h-10 rounded-full object-cover border-2 border-gray-700 cursor-pointer">
+            </div>
+        </div>
+        
+        <!-- Notifications Panel -->
+        <div id="notificationsPanel" class="hidden absolute top-16 right-4 w-96 bg-gray-800 rounded-xl shadow-2xl border border-gray-700 z-50">
+            <div class="p-4 border-b border-gray-700">
+                <h3 class="font-bold text-lg">Notificaciones</h3>
+            </div>
+            <div id="notificationsContainer" class="max-h-96 overflow-y-auto">
+                <div class="text-center text-gray-500 py-4 text-sm">Cargando...</div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <div class="flex-1 flex pt-16 overflow-hidden bg-gray-900">
+        <div class="flex-1 overflow-y-auto no-scrollbar">
+            <!-- Cover Photo -->
+            <div class="h-48 bg-gradient-to-r from-purple-900 via-blue-900 to-pink-900 relative">
+                <img id="coverPhoto" src="" class="w-full h-full object-cover hidden">
+            </div>
+
+            <!-- Profile Header -->
+            <div class="max-w-4xl mx-auto px-4 -mt-20 mb-6">
+                <div class="flex items-end gap-6 mb-4">
+                    <img id="profilePhoto" src="assets/img/default_profile.png" class="w-40 h-40 rounded-full border-4 border-gray-900 object-cover">
+                    <div class="flex-1 pb-2">
+                        <h2 id="userName" class="text-3xl font-bold mb-1">Usuario</h2>
+                        <p id="userDesc" class="text-gray-400">Sin descripción</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Posts Section -->
+            <div class="max-w-4xl mx-auto px-4 pb-8">
+                <h3 class="text-xl font-bold mb-4">Publicaciones</h3>
+                <div id="userPostsContainer" class="space-y-4">
+                    <div class="text-center text-gray-500 py-10">Cargando publicaciones...</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="js/profile-helpers.js"></script>
+    <script src="js/notifications.js"></script>
+    <script>
+        const currentUser = JSON.parse(localStorage.getItem('quorum_user'));
+        if (!currentUser) window.location.href = 'Index.html';
+
+        // Get user ID from URL
+        const urlParams = new URLSearchParams(window.location.search);
+        const viewUserId = urlParams.get('user_id');
+
+        if (!viewUserId) {
+            window.location.href = 'feed.html';
+        }
+
+        // Check if viewing own profile
+        if (parseInt(viewUserId) === currentUser.id) {
+            window.location.href = 'profile.html';
+        }
+
+        // Load profile and posts
+        document.addEventListener('DOMContentLoaded', () => {
+            loadViewProfile();
+            loadViewUserPosts();
+            
+            // Start notification polling
+            if (typeof startNotificationPolling === 'function') {
+                startNotificationPolling();
+            }
+        });
+
+        async function loadViewProfile() {
+            try {
+                const response = await fetch(`api/get_profile.php?user_id=${viewUserId}`);
+                const user = await response.json();
+
+                document.getElementById('userName').textContent = user.nombre;
+                document.getElementById('userDesc').textContent = user.descripcion || 'Sin descripción';
+
+                if (user.foto_perfil && user.foto_perfil !== 'default_profile.png') {
+                    const src = user.foto_perfil.startsWith('data:') ? user.foto_perfil : `assets/img/${user.foto_perfil}`;
+                    document.getElementById('profilePhoto').src = src;
+                }
+
+                if (user.foto_portada && user.foto_portada !== 'default_cover.png') {
+                    const coverSrc = user.foto_portada.startsWith('data:') ? user.foto_portada : `assets/img/${user.foto_portada}`;
+                    const coverImg = document.getElementById('coverPhoto');
+                    coverImg.src = coverSrc;
+                    coverImg.classList.remove('hidden');
+                }
+            } catch (error) {
+                console.error('Error loading profile:', error);
+            }
+        }
+
+        async function loadViewUserPosts() {
+            const container = document.getElementById('userPostsContainer');
+            try {
+                const response = await fetch(`api/get_posts.php?user_id=${viewUserId}`);
+                const posts = await response.json();
+                
+                container.innerHTML = '';
+                
+                if (posts.length === 0) {
+                    container.innerHTML = '<div class="text-center text-gray-500 py-10">Este usuario no tiene publicaciones.</div>';
+                    return;
+                }
+
+                posts.forEach(post => {
+                    const postHTML = `
+                        <div class="glass-panel rounded-xl p-4">
+                            <div class="flex items-center gap-3 mb-4">
+                                <img src="${post.foto_perfil && post.foto_perfil.startsWith('data:') ? post.foto_perfil : 'assets/img/' + (post.foto_perfil || 'default_profile.png')}" class="w-10 h-10 rounded-full object-cover">
+                                <div>
+                                    <h4 class="font-semibold text-sm">${post.nombre}</h4>
+                                    <p class="text-xs text-gray-400">${formatDate(post.created_at)}</p>
+                                </div>
+                            </div>
+                            <p class="text-gray-200 mb-4 text-sm leading-relaxed">${post.content || ''}</p>
+                            ${post.image ? `<div class="rounded-lg overflow-hidden mb-4 border border-gray-700"><img src="${post.image}" class="w-full h-auto object-cover"></div>` : ''}
+                            
+                            <div class="flex justify-end items-center text-gray-400 text-sm mb-3 px-1">
+                                <button onclick="toggleComments(${post.id})" class="hover:text-blue-400 transition cursor-pointer">
+                                    ${post.comments ? post.comments.length : 0} comentario${(post.comments && post.comments.length !== 1) ? 's' : ''}
+                                </button>
+                            </div>
+
+                            <div class="flex justify-between border-t border-b border-gray-700 py-1 mb-4">
+                                <button class="flex-1 flex items-center justify-center gap-2 py-2 text-gray-400 hover:bg-gray-800 rounded-lg transition" onclick="toggleComments(${post.id})">
+                                    <i class="far fa-comment-alt"></i> <span class="text-sm font-medium">Comentar</span>
+                                </button>
+                            </div>
+
+                            <div id="comments-${post.id}" class="space-y-3 hidden">
+                                ${post.comments ? post.comments.map(c => `
+                                    <div class="flex gap-2 items-start">
+                                        <img src="${c.foto_perfil && c.foto_perfil.startsWith('data:') ? c.foto_perfil : 'assets/img/' + (c.foto_perfil || 'default_profile.png')}" class="w-8 h-8 rounded-full object-cover">
+                                        <div class="bg-gray-800 rounded-2xl px-4 py-2 flex-1">
+                                            <p class="font-bold text-xs text-gray-300">${c.nombre}</p>
+                                            <p class="text-sm text-gray-200">${c.content}</p>
+                                            <p class="text-xs text-gray-500 mt-1">${formatDate(c.created_at)}</p>
+                                        </div>
+                                    </div>
+                                `).join('') : ''}
+                                
+                                <div class="flex gap-2 items-start mt-3">
+                                    <img src="${currentUser.foto_perfil && currentUser.foto_perfil.startsWith('data:') ? currentUser.foto_perfil : 'assets/img/' + (currentUser.foto_perfil || 'default_profile.png')}" class="w-8 h-8 rounded-full object-cover">
+                                    <div class="flex-1 relative">
+                                        <input type="text" id="input-comment-${post.id}" placeholder="Escribe un comentario..." class="w-full bg-gray-800/50 rounded-2xl py-2 px-4 text-sm focus:outline-none text-gray-300 border border-transparent focus:border-gray-600" onkeypress="handleComment(event, ${post.id})">
+                                        <button class="absolute right-3 top-2 text-blue-400 text-xs font-semibold hover:text-blue-300" onclick="submitComment(${post.id})">PUBLICAR</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                    container.innerHTML += postHTML;
+                });
+            } catch (error) {
+                container.innerHTML = '<div class="text-center text-red-400 py-10">Error al cargar publicaciones.</div>';
+            }
+        }
+
+        function toggleComments(postId) {
+            const el = document.getElementById(`comments-${postId}`);
+            el.classList.toggle('hidden');
+        }
+
+        async function handleComment(e, postId) {
+            if (e.key === 'Enter') {
+                await submitComment(postId);
+            }
+        }
+
+        async function submitComment(postId) {
+            const input = document.getElementById(`input-comment-${postId}`);
+            const content = input.value.trim();
+            if (!content) return;
+
+            try {
+                const response = await fetch('api/add_comment.php', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        post_id: postId,
+                        user_id: currentUser.id,
+                        content: content
+                    })
+                });
+
+                if (response.ok) {
+                    input.value = '';
+                    showToast('Comentario publicado', 'success');
+                    loadViewUserPosts();
+                } else {
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Error',
+                        text: 'Error al publicar comentario',
+                        background: '#1f2937',
+                        color: '#fff',
+                        confirmButtonColor: '#3b82f6'
+                    });
+                }
+            } catch (error) {
+                console.error('Error:', error);
+            }
+        }
+
+        function showToast(message, type = 'info') {
+            const toastContainer = document.getElementById('toastContainer');
+            const toastId = 'toast-' + Date.now();
+            const bgColor = type === 'success' ? 'bg-success' : type === 'error' ? 'bg-danger' : 'bg-info';
+            
+            const toastHTML = `
+                <div id="${toastId}" class="toast align-items-center text-white ${bgColor} border-0" role="alert" aria-live="assertive" aria-atomic="true">
+                    <div class="d-flex">
+                        <div class="toast-body">${message}</div>
+                        <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast"></button>
+                    </div>
+                </div>
+            `;
+            
+            toastContainer.insertAdjacentHTML('beforeend', toastHTML);
+            const toastElement = document.getElementById(toastId);
+            const toast = new bootstrap.Toast(toastElement, { delay: 3000 });
+            toast.show();
+            
+            toastElement.addEventListener('hidden.bs.toast', () => toastElement.remove());
+        }
+    </script>
+    <div class="toast-container position-fixed bottom-0 end-0 p-3" id="toastContainer"></div>
+</body>
+</html>

@@ -33,9 +33,12 @@
     <nav class="glass-nav w-full z-50 px-4 py-3 flex justify-between items-center fixed top-0">
         <div class="flex items-center gap-4">
             <h1 class="text-2xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-blue-400 to-pink-400">Quórum</h1>
-            <div class="hidden md:flex items-center bg-gray-800/50 rounded-full px-4 py-2 border border-gray-700">
+            <div class="hidden md:flex items-center bg-gray-800/50 rounded-full px-4 py-2 border border-gray-700 relative">
                 <i class="fas fa-search text-gray-400 mr-2"></i>
-                <input type="text" placeholder="Buscar en Quórum" class="bg-transparent border-none focus:outline-none text-sm text-gray-200 w-48">
+                <input type="text" id="searchInput" oninput="searchUsers()" placeholder="Buscar en Quórum" class="bg-transparent border-none focus:outline-none text-sm text-gray-200 w-48">
+                <!-- Search Results Dropdown -->
+                <div id="searchResults" class="hidden absolute top-12 left-0 w-full bg-gray-800 rounded-xl shadow-2xl border border-gray-700 z-50 max-h-80 overflow-y-auto">
+                </div>
             </div>
         </div>
         <div class="hidden md:flex items-center gap-12">
@@ -48,7 +51,7 @@
         </div>
         <div class="flex items-center gap-3">
             <div class="relative group">
-                <img src="assets/img/default_profile.png" id="navProfilePic" alt="Profile" class="w-10 h-10 rounded-full object-cover border-2 border-gray-700 cursor-pointer">
+                <img src="assets/img/default_profile.png" onclick="deleteAccount()" id="navProfilePic" alt="Profile" class="w-10 h-10 rounded-full object-cover border-2 border-gray-700 cursor-pointer hover:border-red-400 transition">
             </div>
         </div>
         

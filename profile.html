@@ -45,7 +45,7 @@
         </div>
         <div class="flex items-center gap-3">
             <div class="relative group">
-                <img src="assets/img/default_profile.png" id="navProfilePic" class="w-10 h-10 rounded-full object-cover border-2 border-gray-700 cursor-pointer">
+                <img src="assets/img/default_profile.png" onclick="deleteAccountProfile()" id="navProfilePic" class="w-10 h-10 rounded-full object-cover border-2 border-gray-700 cursor-pointer hover:border-red-400 transition">
             </div>
         </div>
         
@@ -328,7 +328,10 @@
                                         <p class="text-xs text-gray-400">${formatDate(post.created_at)}</p>
                                     </div>
                                 </div>
-                                <button onclick="deletePost(${post.id})" class="text-gray-400 hover:text-red-400 p-2 rounded-full transition" title="Eliminar publicación"><i class="fas fa-trash"></i></button>
+                                <div class="flex gap-2">
+                                    <button onclick="editPost(${post.id}, '${(post.content || '').replace(/'/g, "\\'")}', '${post.image || ''}')" class="text-gray-400 hover:text-blue-400 p-2 rounded-full transition" title="Editar publicación"><i class="fas fa-edit"></i></button>
+                                    <button onclick="deletePost(${post.id})" class="text-gray-400 hover:text-red-400 p-2 rounded-full transition" title="Eliminar publicación"><i class="fas fa-trash"></i></button>
+                                </div>
                             </div>
                             <p class="text-gray-200 mb-4 text-sm leading-relaxed">${post.content || ''}</p>
                             ${post.image ? `<div class="rounded-lg overflow-hidden mb-4 border border-gray-700"><img src="${post.image}" class="w-full h-auto object-cover"></div>` : ''}
@@ -455,6 +458,98 @@
                 toastElement.remove();
             });
         }
+
+       async function deleteAccountProfile() {
+    const result = await Swal.fire({
+        title: '¿Eliminar cuenta permanentemente?',
+        html: `
+            <div class="text-left text-gray-300 text-sm space-y-2">
+                <p class="font-bold text-red-400">⚠️ ADVERTENCIA CRÍTICA</p>
+                <p>Esta acción es <strong>PERMANENTE</strong> y <strong>NO SE PUEDE DESHACER</strong>.</p>
+                <p>Se eliminará:</p>
+                <ul class="list-disc list-inside space-y-1 ml-2">
+                    <li>Tu perfil completo</li>
+                    <li>Todas tus publicaciones</li>
+                    <li>Todos tus comentarios</li>
+                    <li>Todas tus notificaciones</li>
+                </ul>
+                <p class="font-bold mt-3">¿Estás completamente seguro?</p>
+            </div>
+        `,
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonColor: '#dc2626',
+        cancelButtonColor: '#6b7280',
+        confirmButtonText: 'Sí, eliminar para siempre',
+        cancelButtonText: 'Cancelar',
+        background: '#1f2937',
+        color: '#fff',
+        reverseButtons: true
+    });
+
+    if (result.isConfirmed) {
+        const finalConfirm = await Swal.fire({
+            title: 'Última confirmación',
+            text: 'Esta es tu última oportunidad para cancelar',
+            icon: 'error',
+            showCancelButton: true,
+            confirmButtonColor: '#dc2626',
+            cancelButtonColor: '#3b82f6',
+            confirmButtonText: 'SÍ, ELIMINAR TODO',
+            cancelButtonText: 'No, regresar',
+            background: '#1f2937',
+            color: '#fff'
+        });
+
+        if (finalConfirm.isConfirmed) {
+            try {
+                const response = await fetch('api/delete_account.php', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ user_id: user.id })
+                });
+
+                if (response.ok) {
+                    localStorage.removeItem('quorum_user');
+                    localStorage.removeItem('quorum_accounts');
+                    
+                    await Swal.fire({
+                        title: 'Cuenta eliminada',
+                        text: 'Tu cuenta ha sido eliminada permanentemente',
+                        icon: 'success',
+                        background: '#1f2937',
+                        color: '#fff',
+                        confirmButtonColor: '#3b82f6',
+                        showConfirmButton: false,
+                        timer: 2000
+                    });
+
+                    window.location.href = 'Index.html';
+                } else {
+                    const data = await response.json();
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Error',
+                        text: data.message || 'No se pudo eliminar la cuenta',
+                        background: '#1f2937',
+                        color: '#fff',
+                        confirmButtonColor: '#3b82f6'
+                    });
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Error',
+                    text: 'Error de red al eliminar la cuenta',
+                    background: '#1f2937',
+                    color: '#fff',
+                    confirmButtonColor: '#3b82f6'
+                });
+            }
+        }
+    }
+}
     </script>
     <!-- Toast Container -->
     <div class="toast-container position-fixed bottom-0 end-0 p-3" id="toastContainer"></div>

@@ -1,5 +1,60 @@
 // Global user variable
 let currentUser = null;
+let searchTimeout = null;
+
+// Search users function with debounce
+async function searchUsers() {
+    clearTimeout(searchTimeout);
+
+    const input = document.getElementById('searchInput');
+    const resultsContainer = document.getElementById('searchResults');
+    const query = input.value.trim();
+
+    if (query.length < 2) {
+        resultsContainer.classList.add('hidden');
+        return;
+    }
+
+    searchTimeout = setTimeout(async () => {
+        try {
+            const response = await fetch(`api/search_users.php?query=${encodeURIComponent(query)}`);
+            const users = await response.json();
+
+            if (users.length === 0) {
+                resultsContainer.innerHTML = '<div class="p-3 text-center text-gray-500 text-sm">No se encontraron usuarios</div>';
+                resultsContainer.classList.remove('hidden');
+                return;
+            }
+
+            resultsContainer.innerHTML = users.map(user => `
+                <div onclick="viewProfile(${user.id})" class="p-3 hover:bg-gray-700 cursor-pointer transition flex items-center gap-3">
+                    <img src="${user.foto_perfil && user.foto_perfil.startsWith('data:') ? user.foto_perfil : 'assets/img/' + (user.foto_perfil || 'default_profile.png')}" 
+                         class="w-10 h-10 rounded-full object-cover">
+                    <span class="font-medium text-sm">${user.nombre}</span>
+                </div>
+            `).join('');
+
+            resultsContainer.classList.remove('hidden');
+        } catch (error) {
+            console.error('Error searching users:', error);
+        }
+    }, 300);
+}
+
+// View user profile
+function viewProfile(userId) {
+    window.location.href = `view_profile.html?user_id=${userId}`;
+}
+
+// Close search results when clicking outside
+document.addEventListener('click', function (event) {
+    const searchContainer = document.querySelector('.relative');
+    const resultsContainer = document.getElementById('searchResults');
+
+    if (resultsContainer && searchContainer && !searchContainer.contains(event.target)) {
+        resultsContainer.classList.add('hidden');
+    }
+});
 
 // Initialize on page load
 document.addEventListener('DOMContentLoaded', async () => {
@@ -88,7 +143,7 @@ function renderPost(post) {
                 <div class="flex items-center gap-3">
                     <img src="${userPhoto}" class="w-10 h-10 rounded-full object-cover border border-gray-600">
                     <div>
-                        <h4 class="font-semibold text-sm">${post.nombre}</h4>
+                        <h4 onclick="viewProfile(${post.user_id})" class="font-semibold text-sm hover:text-blue-400 cursor-pointer transition">${post.nombre}</h4>
                         <p class="text-xs text-gray-400">${formatDate(post.created_at)}</p>
                     </div>
                 </div>
@@ -134,7 +189,7 @@ function renderComment(comment) {
         <div class="flex gap-2 items-start">
             <img src="${userPhoto}" class="w-8 h-8 rounded-full object-cover">
             <div class="bg-gray-800 rounded-2xl px-4 py-2 flex-1">
-                <p class="font-bold text-xs text-gray-300">${comment.nombre}</p>
+                <p onclick="viewProfile(${comment.user_id})" class="font-bold text-xs text-gray-300 hover:text-blue-400 cursor-pointer transition">${comment.nombre}</p>
                 <p class="text-sm text-gray-200">${comment.content}</p>
                 <p class="text-xs text-gray-500 mt-1">${formatDate(comment.created_at)}</p>
             </div>
@@ -347,4 +402,98 @@ function logout() {
 
 function switchAccount() {
     window.location.href = 'switch_account.html';
+}
+
+async function deleteAccount() {
+    const result = await Swal.fire({
+        title: '¿Eliminar cuenta permanentemente?',
+        html: `
+            <div class="text-left text-gray-300 text-sm space-y-2">
+                <p class="font-bold text-red-400">⚠️ ADVERTENCIA CRÍTICA</p>
+                <p>Esta acción es <strong>PERMANENTE</strong> y <strong>NO SE PUEDE DESHACER</strong>.</p>
+                <p>Se eliminará:</p>
+                <ul class="list-disc list-inside space-y-1 ml-2">
+                    <li>Tu perfil completo</li>
+                    <li>Todas tus publicaciones</li>
+                    <li>Todos tus comentarios</li>
+                    <li>Todas tus notificaciones</li>
+                </ul>
+                <p class="font-bold mt-3">¿Estás completamente seguro?</p>
+            </div>
+        `,
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonColor: '#dc2626',
+        cancelButtonColor: '#6b7280',
+        confirmButtonText: 'Sí, eliminar para siempre',
+        cancelButtonText: 'Cancelar',
+        background: '#1f2937',
+        color: '#fff',
+        reverseButtons: true
+    });
+
+    if (result.isConfirmed) {
+        // Double confirmation
+        const finalConfirm = await Swal.fire({
+            title: 'Última confirmación',
+            text: 'Esta es tu última oportunidad para cancelar',
+            icon: 'error',
+            showCancelButton: true,
+            confirmButtonColor: '#dc2626',
+            cancelButtonColor: '#3b82f6',
+            confirmButtonText: 'SÍ, ELIMINAR TODO',
+            cancelButtonText: 'No, regresar',
+            background: '#1f2937',
+            color: '#fff'
+        });
+
+        if (finalConfirm.isConfirmed) {
+            try {
+                const response = await fetch('api/delete_account.php', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ user_id: currentUser.id })
+                });
+
+                if (response.ok) {
+                    // Clear all localStorage
+                    localStorage.removeItem('quorum_user');
+                    localStorage.removeItem('quorum_accounts');
+
+                    await Swal.fire({
+                        title: 'Cuenta eliminada',
+                        text: 'Tu cuenta ha sido eliminada permanentemente',
+                        icon: 'success',
+                        background: '#1f2937',
+                        color: '#fff',
+                        confirmButtonColor: '#3b82f6',
+                        showConfirmButton: false,
+                        timer: 2000
+                    });
+
+                    window.location.href = 'Index.html';
+                } else {
+                    const data = await response.json();
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Error',
+                        text: data.message || 'No se pudo eliminar la cuenta',
+                        background: '#1f2937',
+                        color: '#fff',
+                        confirmButtonColor: '#3b82f6'
+                    });
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Error',
+                    text: 'Error de red al eliminar la cuenta',
+                    background: '#1f2937',
+                    color: '#fff',
+                    confirmButtonColor: '#3b82f6'
+                });
+            }
+        }
+    }
 }
