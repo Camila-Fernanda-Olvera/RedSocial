@@ -1,7 +1,25 @@
+// Notification functions
+let notificationInterval = null;
+
+// Load notification count
+async function loadNotificationCount() {
+    const currentUser = JSON.parse(localStorage.getItem('quorum_user'));
+    if (!currentUser) return;
+
+    try {
+        const response = await fetch(`api/get_notification_count.php?user_id=${currentUser.id}`);
+        const data = await response.json();
+
+        const badge = document.getElementById('notificationBadge');
+        if (data.count > 0) {
+            badge.textContent = data.count > 9 ? '9+' : data.count;
+            badge.classList.remove('hidden');
+        } else {
+            badge.classList.add('hidden');
         }
     } catch (error) {
-    console.error('Error loading notification count:', error);
-}
+        console.error('Error loading notification count:', error);
+    }
 }
 
 // Start polling for notifications
@@ -24,6 +42,21 @@ function toggleNotifications() {
         loadNotifications();
         panel.classList.remove('hidden');
     } else {
+        panel.classList.add('hidden');
+    }
+}
+
+// Load notifications
+async function loadNotifications() {
+    const currentUser = JSON.parse(localStorage.getItem('quorum_user'));
+    if (!currentUser) return;
+
+    try {
+        const response = await fetch(`api/get_notifications.php?user_id=${currentUser.id}`);
+        const notifications = await response.json();
+
+        const container = document.getElementById('notificationsContainer');
+
         if (notifications.length === 0) {
             container.innerHTML = '<div class="text-center text-gray-500 py-4 text-sm">No hay notificaciones</div>';
             return;
@@ -47,6 +80,21 @@ function toggleNotifications() {
         // Mark as read after viewing
         markNotificationsRead();
     } catch (error) {
+        console.error('Error loading notifications:', error);
+    }
+}
+
+// Mark notifications as read
+async function markNotificationsRead() {
+    const currentUser = JSON.parse(localStorage.getItem('quorum_user'));
+    if (!currentUser) return;
+
+    try {
+        await fetch('api/mark_notifications_read.php', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ user_id: currentUser.id })
+        });
 
         // Update badge
         loadNotificationCount();
