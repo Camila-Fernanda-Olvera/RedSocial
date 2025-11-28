@@ -5,3 +5,4 @@ Propósito: generar un commit no vacío con contenido inofensivo.
 No afecta al proyecto principal.
  
 Commit de prueba: social: publicación compartida - Fecha: 27-11-2025
+Commit automático: social: nuevo seguidor - Fecha: 2025-11-27 20:06:27 - Autor: vickyjuarez
