@@ -346,12 +346,5 @@ function logout() {
 }
 
 function switchAccount() {
-    Swal.fire({
-        title: 'Próximamente',
-        text: 'La funcionalidad de cambiar cuenta estará disponible pronto.',
-        icon: 'info',
-        background: '#1f2937',
-        color: '#fff',
-        confirmButtonColor: '#3b82f6'
-    });
+    window.location.href = 'switch_account.html';
 }
