@@ -7,6 +7,7 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <style>
         body { font-family: 'Outfit', sans-serif; }
         .glass-panel {
@@ -171,7 +172,14 @@
         }
 
         function switchAccount() {
-            alert('Funcionalidad de cambiar cuenta próximamente.');
+            Swal.fire({
+                title: 'Próximamente',
+                text: 'La funcionalidad de cambiar cuenta estará disponible pronto.',
+                icon: 'info',
+                background: '#1f2937',
+                color: '#fff',
+                confirmButtonColor: '#3b82f6'
+            });
         }
 
         // Load user info

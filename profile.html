@@ -7,6 +7,7 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <style>
         body { font-family: 'Outfit', sans-serif; }
         .glass-panel {
@@ -88,21 +89,8 @@
             <!-- Content Grid -->
             <div class="flex flex-col md:flex-row gap-6 px-4">
                 
-                <!-- Left Column: Intro -->
-                <div class="w-full md:w-1/3 space-y-4">
-                    <div class="glass-panel p-4 rounded-xl">
-                        <h3 class="font-bold text-lg mb-3">Detalles</h3>
-                        <div class="space-y-3 text-gray-300 text-sm">
-                            <div class="flex items-center gap-2"><i class="fas fa-briefcase text-gray-500 w-5"></i> <span>Trabaja en <strong>Quórum</strong></span></div>
-                            <div class="flex items-center gap-2"><i class="fas fa-graduation-cap text-gray-500 w-5"></i> <span>Estudió en <strong>Universidad</strong></span></div>
-                            <div class="flex items-center gap-2"><i class="fas fa-home text-gray-500 w-5"></i> <span>Vive en <strong>Ciudad de México</strong></span></div>
-                            <div class="flex items-center gap-2"><i class="fas fa-clock text-gray-500 w-5"></i> <span>Se unió en <span id="joinDate">2023</span></span></div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Right Column: Posts -->
-                <div class="w-full md:w-2/3 space-y-6">
+                <!-- Posts Column (Centered/Full) -->
+                <div class="w-full max-w-2xl mx-auto space-y-6">
                     <!-- Create Post (Simplified) -->
                     <div class="glass-panel rounded-xl p-4">
                         <div class="flex gap-3 mb-4">
@@ -233,19 +221,6 @@
             data.id = user.id;
             try {
                 const response = await fetch('api/update_profile.php', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(data)
-                });
-                const result = await response.json();
-                
-                if (response.ok) {
-                    // Fetch updated profile to sync localStorage
-                    const profileResponse = await fetch(`api/get_profile.php?user_id=${user.id}`);
-                    if (profileResponse.ok) {
-                        const updatedUser = await profileResponse.json();
-                        // Merge with existing session data (keep id, etc)
-                        const newSession = { ...user, ...updatedUser };
                         localStorage.setItem('quorum_user', JSON.stringify(newSession));
                         
                         // Update global user variable if needed, or reload
@@ -377,7 +352,13 @@
                     input.value = '';
                     loadUserPosts(); // Reload to show new comment
                 } else {
-                    alert('Error al publicar comentario');
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Error',
+                        text: 'Error al publicar comentario',
+                        background: '#1f2937',
+                        color: '#fff'
+                    });
                 }
             } catch (error) {
                 console.error('Error:', error);
