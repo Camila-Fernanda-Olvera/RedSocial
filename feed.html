@@ -178,9 +178,20 @@
         document.addEventListener('DOMContentLoaded', () => {
             const user = JSON.parse(localStorage.getItem('quorum_user'));
             if (user) {
-                document.getElementById('navUserName').innerText = user.nombre;
-                document.getElementById('sidebarUserName').innerText = user.nombre;
-                // Update profile pics if available
+                // document.getElementById('navUserName').innerText = user.nombre; // Element removed
+                if (document.getElementById('sidebarUserName')) {
+                    document.getElementById('sidebarUserName').innerText = user.nombre;
+                }
+                
+                // Update profile pics
+                if (user.foto_perfil && user.foto_perfil !== 'default_profile.png') {
+                    const src = user.foto_perfil.startsWith('data:') ? user.foto_perfil : `assets/img/${user.foto_perfil}`;
+                    const pics = ['navProfilePic', 'sidebarProfilePic', 'createPostProfilePic'];
+                    pics.forEach(id => {
+                        const el = document.getElementById(id);
+                        if (el) el.src = src;
+                    });
+                }
             }
         });
     </script>
