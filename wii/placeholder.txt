@@ -15,3 +15,4 @@ Commit automÃ¡tico: social: actualizaciÃ³n de perfil - Fecha: 2025-11-27 22:50:2
 publicaciones: añadir metadatos de publicación - Fecha: 2025-11-27 23:01:10
 imagenes: optimizar carga y placeholder - Fecha: 2025-11-27 23:01:11
 comentarios: establecer tiempo límite de comentarios - Fecha: 2025-11-27 23:01:13
+notificaciones: crear tabla de notificaciones - Fecha: 2025-11-27 23:24:40
