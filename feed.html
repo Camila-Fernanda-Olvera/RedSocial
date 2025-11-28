@@ -48,44 +48,17 @@
         </div>
 
         <!-- Center Nav Icons -->
-        <div class="hidden md:flex items-center gap-8">
-            <a href="#" class="text-blue-500 border-b-2 border-blue-500 pb-1"><i class="fas fa-home text-2xl"></i></a>
-            <a href="#" class="text-gray-400 hover:text-gray-200 transition"><i class="fas fa-user-friends text-2xl"></i></a>
-            <a href="#" class="text-gray-400 hover:text-gray-200 transition"><i class="fas fa-video text-2xl"></i></a>
-            <a href="#" class="text-gray-400 hover:text-gray-200 transition"><i class="fas fa-store text-2xl"></i></a>
+        <div class="hidden md:flex items-center gap-12">
+            <a href="feed.html" class="text-blue-500 border-b-2 border-blue-500 pb-1"><i class="fas fa-home text-2xl"></i></a>
+            <a href="profile.html" class="text-gray-400 hover:text-gray-200 transition"><i class="fas fa-user text-2xl"></i></a>
+            <button class="text-gray-400 hover:text-gray-200 transition"><i class="fas fa-bell text-2xl"></i></button>
         </div>
 
-        <!-- Right Menu -->
+        <!-- Right Menu (Simplified) -->
         <div class="flex items-center gap-3">
-            <button class="w-10 h-10 rounded-full bg-gray-800 hover:bg-gray-700 flex items-center justify-center transition">
-                <i class="fas fa-bell text-gray-200"></i>
-            </button>
-            <button class="w-10 h-10 rounded-full bg-gray-800 hover:bg-gray-700 flex items-center justify-center transition">
-                <i class="fas fa-comment-dots text-gray-200"></i>
-            </button>
-            
             <!-- Profile Dropdown Trigger -->
             <div class="relative group">
                 <img src="assets/img/default_profile.png" id="navProfilePic" alt="Profile" class="w-10 h-10 rounded-full object-cover border-2 border-gray-700 cursor-pointer">
-                <!-- Dropdown Menu -->
-                <div class="absolute right-0 top-12 w-64 glass-panel rounded-xl shadow-2xl p-2 hidden group-hover:block hover:block transform origin-top-right transition-all">
-                    <div class="p-3 border-b border-gray-700 mb-2">
-                        <p class="font-semibold" id="navUserName">Usuario</p>
-                        <p class="text-xs text-gray-400">Ver tu perfil</p>
-                    </div>
-                    <a href="profile.html" class="flex items-center gap-3 p-2 hover:bg-gray-700/50 rounded-lg transition">
-                        <i class="fas fa-user-circle text-gray-400"></i>
-                        <span>Mi Perfil</span>
-                    </a>
-                    <div class="flex items-center gap-3 p-2 hover:bg-gray-700/50 rounded-lg transition cursor-pointer" onclick="switchAccount()">
-                        <i class="fas fa-exchange-alt text-gray-400"></i>
-                        <span>Cambiar de Cuenta</span>
-                    </div>
-                    <div class="flex items-center gap-3 p-2 hover:bg-gray-700/50 rounded-lg transition cursor-pointer text-red-400" onclick="logout()">
-                        <i class="fas fa-sign-out-alt"></i>
-                        <span>Cerrar Sesión</span>
-                    </div>
-                </div>
             </div>
         </div>
     </nav>
@@ -100,22 +73,14 @@
                     <img src="assets/img/default_profile.png" id="sidebarProfilePic" class="w-8 h-8 rounded-full object-cover">
                     <span class="font-medium" id="sidebarUserName">Usuario</span>
                 </a>
-                <a href="#" class="flex items-center gap-3 p-3 hover:bg-gray-800 rounded-xl transition cursor-pointer">
-                    <i class="fas fa-user-friends text-blue-400 w-8 text-center text-xl"></i>
-                    <span class="font-medium">Amigos</span>
-                </a>
-                <a href="#" class="flex items-center gap-3 p-3 hover:bg-gray-800 rounded-xl transition cursor-pointer">
-                    <i class="fas fa-users text-blue-400 w-8 text-center text-xl"></i>
-                    <span class="font-medium">Grupos</span>
-                </a>
-                <a href="#" class="flex items-center gap-3 p-3 hover:bg-gray-800 rounded-xl transition cursor-pointer">
-                    <i class="fas fa-store text-blue-400 w-8 text-center text-xl"></i>
-                    <span class="font-medium">Marketplace</span>
-                </a>
-                <a href="#" class="flex items-center gap-3 p-3 hover:bg-gray-800 rounded-xl transition cursor-pointer">
-                    <i class="fas fa-clock text-blue-400 w-8 text-center text-xl"></i>
-                    <span class="font-medium">Recuerdos</span>
-                </a>
+                <div onclick="switchAccount()" class="flex items-center gap-3 p-3 hover:bg-gray-800 rounded-xl transition cursor-pointer">
+                    <i class="fas fa-exchange-alt text-purple-400 w-8 text-center text-xl"></i>
+                    <span class="font-medium">Cambiar de Cuenta</span>
+                </div>
+                <div onclick="logout()" class="flex items-center gap-3 p-3 hover:bg-gray-800 rounded-xl transition cursor-pointer text-red-400">
+                    <i class="fas fa-sign-out-alt w-8 text-center text-xl"></i>
+                    <span class="font-medium">Cerrar Sesión</span>
+                </div>
             </div>
         </div>
 
@@ -129,18 +94,10 @@
                         <img src="assets/img/default_profile.png" id="createPostProfilePic" class="w-10 h-10 rounded-full object-cover">
                         <input type="text" placeholder="¿Qué estás pensando?" class="flex-1 bg-gray-800/50 rounded-full px-4 focus:outline-none hover:bg-gray-800 transition cursor-pointer text-gray-300">
                     </div>
-                    <div class="border-t border-gray-700 pt-3 flex justify-between px-4">
+                    <div class="border-t border-gray-700 pt-3 flex justify-start px-4">
                         <button class="flex items-center gap-2 text-gray-400 hover:bg-gray-800 px-4 py-2 rounded-lg transition">
-                            <i class="fas fa-video text-red-500"></i>
-                            <span class="text-sm font-medium">Video en vivo</span>
-                        </button>
-                        <button class="flex items-center gap-2 text-gray-400 hover:bg-gray-800 px-4 py-2 rounded-lg transition">
-                            <i class="fas fa-images text-green-500"></i>
-                            <span class="text-sm font-medium">Foto/Video</span>
-                        </button>
-                        <button class="flex items-center gap-2 text-gray-400 hover:bg-gray-800 px-4 py-2 rounded-lg transition">
-                            <i class="far fa-smile text-yellow-500"></i>
-                            <span class="text-sm font-medium">Sentimiento</span>
+                            <i class="fas fa-image text-green-500"></i>
+                            <span class="text-sm font-medium">Imagen</span>
                         </button>
                     </div>
                 </div>
