@@ -145,9 +145,10 @@
                     btn.classList.add('bg-green-500');
                     
                     setTimeout(() => {
-                        // Redirect to home/feed (to be implemented)
-                        alert('Bienvenido ' + result.user.nombre);
-                        // window.location.href = 'feed.php'; 
+                        // Redirect to home/feed
+                        // Store user info in localStorage for simple session management
+                        localStorage.setItem('quorum_user', JSON.stringify(result.user));
+                        window.location.href = 'feed.html'; 
                     }, 1000);
                 } else {
                     // Login failed

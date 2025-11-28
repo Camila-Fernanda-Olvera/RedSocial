@@ -1,42 +1,33 @@
 <?php
-session_start();
 header("Access-Control-Allow-Origin: *");
 header("Content-Type: application/json; charset=UTF-8");
-header("Access-Control-Allow-Methods: GET");
-header("Access-Control-Max-Age: 3600");
-header("Access-Control-Allow-Headers: Content-Type, Access-Control-Allow-Headers, Authorization, X-Requested-With");
 
 include_once '../config/db.php';
-include_once '../classes/User.php';
 
 $database = new Database();
 $db = $database->getConnection();
 
-$user = new User($db);
+if (isset($_GET['user_id'])) {
+    try {
+        $query = "SELECT id, nombre, correo, foto_perfil, foto_portada, descripcion, fecha_registro FROM users WHERE id = :id LIMIT 1";
+        $stmt = $db->prepare($query);
+        $stmt->bindParam(':id', $_GET['user_id']);
+        $stmt->execute();
 
-// Check if user is logged in
-if (!isset($_SESSION['user_id'])) {
-    http_response_code(401);
-    echo json_encode(array("message" => "No autorizado. Por favor inicia sesión."));
-    exit();
-}
+        $row = $stmt->fetch(PDO::FETCH_ASSOC);
 
-$user_id = $_SESSION['user_id'];
-
-// Get user profile data
-$userData = $user->getUserById($user_id);
-
-if ($userData) {
-    // Get user stats
-    $stats = $user->getUserStats($user_id);
-
-    http_response_code(200);
-    echo json_encode(array(
-        "user" => $userData,
-        "stats" => $stats
-    ));
+        if ($row) {
+            echo json_encode($row);
+        } else {
+            http_response_code(404);
+            echo json_encode(["message" => "Usuario no encontrado."]);
+        }
+    } catch (PDOException $e) {
+        http_response_code(500);
+        echo json_encode(["message" => "Error: " . $e->getMessage()]);
+    }
 } else {
-    http_response_code(404);
-    echo json_encode(array("message" => "Usuario no encontrado."));
+    http_response_code(400);
+    echo json_encode(["message" => "Falta el ID de usuario."]);
 }
 ?>
